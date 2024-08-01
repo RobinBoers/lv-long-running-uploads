@@ -17,7 +17,11 @@ defmodule ReproductionWeb.Router do
   scope "/", ReproductionWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live_session :default do
+      live "/", ThingLive
+      live "/other", OtherLive
+      live "/:thing", ThingLive
+    end
   end
 
   # Other scopes may use custom stacks.

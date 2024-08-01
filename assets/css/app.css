@@ -3,3 +3,8 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+@layer utilities {
+  .link {
+    @apply text-sm text-brand bg-brand/10 p-2 rounded-lg hover:bg-brand/[.08] transition;
+  }
+}
