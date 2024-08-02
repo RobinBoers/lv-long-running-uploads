@@ -66,6 +66,14 @@ defmodule ReproductionWeb do
     end
   end
 
+  def upload_writer do
+    quote do
+      @behaviour Phoenix.LiveView.UploadWriter
+
+      unquote(html_helpers())
+    end
+  end
+
   def html do
     quote do
       use Phoenix.Component

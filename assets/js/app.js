@@ -21,36 +21,10 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
-import * as UpChunk from "@mux/upchunk"
-
-let Uploaders = {}
-
-Uploaders.UpChunk = function(entries, onViewError) {
-  entries.forEach(entry => {
-    // create the upload session with UpChunk
-    let { file, meta: { entrypoint } } = entry
-    let upload = UpChunk.createUpload({ endpoint: entrypoint, file })
-
-    // stop uploading in the event of a view error
-    onViewError(() => upload.pause())
-
-    // upload error triggers LiveView error
-    upload.on("error", (e) => entry.error(e.detail.message))
-
-    // notify progress events to LiveView
-    upload.on("progress", (e) => {
-      if(e.detail < 100) entry.progress(e.detail)
-    })
-
-    // success completes the UploadEntry
-    upload.on("success", () => entry.progress(100))
-  })
-}
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  uploaders: Uploaders,
   params: {_csrf_token: csrfToken}
 })
 

@@ -11,7 +11,7 @@ defmodule ReproductionWeb.ThingLive do
       accept: ~w(.mp4 .mov),
       max_entries: 1,
       max_file_size: @a_lot,
-      external: &presign_upload/2
+      writer: &writer/3
     ]
 
     socket =
@@ -25,23 +25,8 @@ defmodule ReproductionWeb.ThingLive do
     {:ok, socket}
   end
 
-  def presign_upload(_entry, socket) do
-    {:ok, %{"url" => url, "id" => mux_id}, _} = create_mux_video()
-    socket = assign(socket, :mux_id, mux_id)
-
-    {:ok, %{uploader: "UpChunk", entrypoint: url}, socket}
-  end
-
-  def create_mux_video do
-    client = Mux.client(
-      System.fetch_env!("MUX_TOKEN_ID"),
-      System.fetch_env!("MUX_TOKEN_SECRET")
-    )
-
-    Mux.Video.Uploads.create(client, %{
-      "new_asset_settings" => %{"playback_policies" => ["public", "signed"], "encoding_tier" => "baseline"},
-      "cors_origin" => "localhost/*"
-    })
+  defp writer(_name, _entry, _socket) do
+    {ReproductionWeb.SlowWriter, level: :debug, timeout: 1000}
   end
 
   @impl true
